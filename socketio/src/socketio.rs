@@ -1,33 +1,33 @@
-// use crossbeam::channel::unbounded;
-// use crossbeam::channel::{Receiver, Sender};
-use tokio::sync::broadcast::channel as unbounded;
-use tokio::sync::broadcast::{Receiver, Sender};
-
 use futures::stream::FuturesUnordered;
 use futures_util::sink::SinkExt;
 use futures_util::stream::SplitSink;
-use log::{trace, debug, info};
+use log::{debug, info, trace};
 use std::boxed::Box;
 use std::collections::HashMap;
 use std::fmt;
 use std::future::Future;
 use std::pin::Pin;
 use std::sync::RwLock;
+use tokio::sync::broadcast::{Receiver, Sender};
+// use crossbeam::channel::unbounded;
+// use crossbeam::channel::{Receiver, Sender};
+use tokio::sync::broadcast::channel as unbounded;
 use tokio_stream::StreamExt;
 use tokio_tungstenite::tungstenite::Message;
 use tokio_tungstenite::WebSocketStream;
 
 use crate::rooms::{
-    get_sockets_for_room, join_channel_to_room, remove_socket_from_room, ChannelPair,
+    ChannelPair, get_sockets_for_room, join_channel_to_room, remove_socket_from_room,
 };
 use crate::socketio_message::SocketIOMessage;
 
 pub type SocketIOHandler =
-    fn(SocketIOSocket, String) -> Pin<Box<dyn Future<Output = Result<(), ()>> + Send>>;
+fn(SocketIOSocket, String) -> Pin<Box<dyn Future<Output=Result<(), ()>> + Send>>;
 
 pub const SOCKETIO_PING: &'static str = "2";
 pub const SOCKETIO_PONG: &'static str = "3";
-pub const SOCKETIO_EVENT_OPEN: &'static str = "40"; // Message, then open
+pub const SOCKETIO_EVENT_OPEN: &'static str = "40";
+// Message, then open
 pub const SOCKETIO_EVENT_MESSAGE: &'static str = "42"; // Message, then event
 
 lazy_static! {
@@ -49,16 +49,16 @@ pub async fn broadcast(room_id: &str, event: &str, message: &str) {
     match get_sockets_for_room(room_id) {
         Some(channels) => {
             for channel in &*channels {
-                    channel.send(InternalMessage::IO(SocketIOMessage::SendMessage(
-                        event.to_string(),
-                        message.to_string(),
-                    )));
-                    debug!("Found socketid {} in room {}, sending message = {}", channel.sid(), room_id, message);
+                channel.send(InternalMessage::IO(SocketIOMessage::SendMessage(
+                    event.to_string(),
+                    message.to_string(),
+                )));
+                debug!("Found socketid {} in room {}, sending message = {}", channel.sid(), room_id, message);
             }
         }
         None => {
             trace!("Found no socketid in room {}, not sending message = {}", room_id, message);
-        },
+        }
     }
 }
 
@@ -309,7 +309,7 @@ impl SocketIOWrapper {
         // remove the socket from all joined rooms
         for room in &self.rooms {
             remove_socket_from_room(&room, &self.sid);
-            debug!("SocketIOMessage socketid {} closed, leave room {}", self.sid, room);                            
+            debug!("SocketIOMessage socketid {} closed, leave room {}", self.sid, room);
         }
 
         let _res = self.socket.close().await;
@@ -400,7 +400,7 @@ impl SocketIOWrapper {
                             // check if room_id exist. Don't use return because of the following process such as PING/PONG.
                             if !self.rooms.contains(&room_id) {
                                 self.rooms.push(room_id.to_string());
-                                debug!("SocketIOMessage socketid {} joined room {}. Rooms = {:?}, rooms len = {}", self.sid, room_id, self.rooms, self.rooms.len());                            
+                                debug!("SocketIOMessage socketid {} joined room {}. Rooms = {:?}, rooms len = {}", self.sid, room_id, self.rooms, self.rooms.len());
 
                                 //Call rooms::join_channel_to_room
                                 join_channel_to_room(
@@ -417,7 +417,7 @@ impl SocketIOWrapper {
                             for room in &self.rooms {
                                 if room == &room_id {
                                     self.rooms.remove(i);
-                                    debug!("SocketIOMessage socketid {} leaved room {}. Rooms = {:?}, rooms len = {}", self.sid, room_id, self.rooms, self.rooms.len());                            
+                                    debug!("SocketIOMessage socketid {} leaved room {}. Rooms = {:?}, rooms len = {}", self.sid, room_id, self.rooms, self.rooms.len());
 
                                     //Call rooms::remove_socket_from_room
                                     remove_socket_from_room(&room_id, &self.sid);

@@ -1,7 +1,7 @@
 extern crate proc_macro;
 
-use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span as Span2};
+use proc_macro::TokenStream;
 use quote::quote;
 
 #[proc_macro_attribute]
@@ -25,7 +25,7 @@ pub fn socketio_handler(attr: TokenStream, item: TokenStream) -> TokenStream {
                 crate::core::{ IOSocketWrapper as #socket_io_type }
             },
             _ => quote! {
-                thruster_socketio::{ SocketIO as #socket_io_type }
+                socketio::{ SocketIO as #socket_io_type }
             },
         };
 
@@ -71,7 +71,7 @@ pub fn socketio_listener(attr: TokenStream, item: TokenStream) -> TokenStream {
                 crate::core::{ IOSocketWrapper as #socket_io_type }
             },
             _ => quote! {
-                thruster_socketio::{ SocketIO as #socket_io_type }
+                socketio::{ SocketIO as #socket_io_type }
             },
         };
 

@@ -1,10 +1,9 @@
 use chashmap::{CHashMap, ReadGuard};
-use log::{debug};
-
-use crate::socketio::InternalMessage;
-
+use log::debug;
 // use crossbeam::channel::Sender;
 use tokio::sync::broadcast::Sender;
+
+use crate::socketio::InternalMessage;
 
 lazy_static! {
     static ref ROOMS: CHashMap<String, Vec<ChannelPair>> = CHashMap::new();
@@ -120,4 +119,4 @@ pub fn print_sockets_for_room(room_id: &str) {
 pub fn get_rooms_count() -> usize {
     ROOMS.len()
 }
-    
+

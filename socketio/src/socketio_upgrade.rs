@@ -14,8 +14,8 @@ use tokio_tungstenite::tungstenite::Message;
 
 use crate::sid::generate_sid;
 use crate::socketio::{
-    InternalMessage, SocketIOSocket, SocketIOWrapper as SocketIO, WSSocketMessage,
-    SOCKETIO_EVENT_OPEN, SOCKETIO_PING,
+    InternalMessage, SOCKETIO_EVENT_OPEN, SOCKETIO_PING, SocketIOSocket,
+    SocketIOWrapper as SocketIO, WSSocketMessage,
 };
 use crate::socketio_context::SocketIOContext;
 
@@ -48,7 +48,7 @@ enum AllowedVersions {
 /// (and will!) be dropped.
 pub async fn handle_io<T: Context + SocketIOContext + Default>(
     context: T,
-    handler: fn(SocketIOSocket) -> Pin<Box<dyn Future<Output = Result<SocketIOSocket, ()>> + Send>>,
+    handler: fn(SocketIOSocket) -> Pin<Box<dyn Future<Output=Result<SocketIOSocket, ()>> + Send>>,
 ) -> MiddlewareResult<T> {
     handle_io_with_capacity(context, handler, 16).await
 }
@@ -56,7 +56,7 @@ pub async fn handle_io<T: Context + SocketIOContext + Default>(
 /// Handles any incoming socket.io requests for a particular context by using the passed in handler.
 pub async fn handle_io_with_capacity<T: Context + SocketIOContext + Default>(
     mut context: T,
-    handler: fn(SocketIOSocket) -> Pin<Box<dyn Future<Output = Result<SocketIOSocket, ()>> + Send>>,
+    handler: fn(SocketIOSocket) -> Pin<Box<dyn Future<Output=Result<SocketIOSocket, ()>> + Send>>,
     message_capacity: usize,
 ) -> MiddlewareResult<T> {
     let param_map = match context.route().split("?").collect::<Vec<&str>>().get(1) {
@@ -112,7 +112,7 @@ pub async fn handle_io_with_capacity<T: Context + SocketIOContext + Default>(
             ping_interval: 25000,
             ping_timeout: 20000,
         })
-        .unwrap();
+            .unwrap();
 
         let encoded_opener = format!("0{}", body);
 
@@ -127,7 +127,7 @@ pub async fn handle_io_with_capacity<T: Context + SocketIOContext + Default>(
                 tokio_tungstenite::tungstenite::protocol::Role::Server,
                 None,
             )
-            .await;
+                .await;
             let (mut ws_sender, mut ws_receiver) = ws_stream.split();
 
             // TODO(trezm): Handle errors here

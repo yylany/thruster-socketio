@@ -1,0 +1,29 @@
+[package]
+name = "socketio"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+
+[dependencies]
+base64 = "0.11"
+chashmap = "2.2"
+env_logger = { version = "0.3.4", default-features = false }
+futures-util = "0.3"
+futures = "0.3"
+hyper = "*"
+lazy_static = "1.4.0"
+log = "0.4"
+rand = "0.7"
+rust-crypto = "0.2"
+serde = "1.0.24"
+serde_json = "1.0.8"
+serde_derive = "1.0.24"
+thruster = { version = "1.2.2", features = ["hyper_server", "file"] }
+proc = { path = "./../proc" }
+tokio = { version = "1.2", features = ["full"] }
+tokio-stream = { version = "0.1.6", features = ["net"] }
+tokio-tungstenite = "0.14"
+[dev-dependencies]
+dotenv = "0.13.0"
